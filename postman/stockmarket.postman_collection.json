@@ -1,0 +1,68 @@
+{
+    "name": "Add Stock to Portfolio",
+    "request": {
+        "method": "POST",
+        "header": [
+            {
+                "key": "Content-Type",
+                "value": "application/json"
+            },
+            {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+            }
+        ],
+        "body": {
+            "mode": "raw",
+            "raw": {
+                "symbol": "GOLD"
+            }
+        },
+        "url": {
+            "raw": "{{baseUrl}}/api/stock/add",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "stock", "add"]
+        }
+    },
+    "response": [
+        {
+            "name": "Success",
+            "originalRequest": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": {
+                        "symbol": "GOLD"
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/stock/add",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["api", "stock", "add"]
+                }
+            },
+            "status": "OK",
+            "code": 200,
+            "_postman_previewlanguage": "json",
+            "header": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "message": "Stock added to portfolio successfully"
+            }
+        }
+    ]
+} 
