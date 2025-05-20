@@ -5,33 +5,40 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/atgdot/stockmarket/serverinternal/database"
-	"github.com/atgdot/stockmarket/serverinternal/features/auth/jwt"
+	"stockmarket/server/internal/database"
+	"stockmarket/server/internal/models"
+
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type User struct {
-	Email        string `json:"email"`
-	Password     string `json:"password,omitempty"`
-	PasswordHash string `json:"-"`
-	CreatedAt    string `json:"createdAt"`
+// HashPassword hashes a password using bcrypt
+func HashPassword(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("failed to hash password: %v", err)
+	}
+	return string(hashedPassword), nil
 }
 
+// CreateUser creates a new user in the database.
 func CreateUser(ctx context.Context, email, password string) error {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := HashPassword(password)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create user: %v", err)
 	}
 
-	user := User{
+	user := models.User{
+		UserID:       uuid.New().String(),
 		Email:        email,
-		PasswordHash: string(hashed),
-		CreatedAt:    time.Now().Format(time.RFC3339),
+		PasswordHash: hashedPassword,
+		CreatedAt:    time.Now(),
 	}
 
 	return database.SaveUser(ctx, user)
 }
 
+// ValidateUser validates user credentials and returns a JWT token if valid
 func ValidateUser(ctx context.Context, email, password string) (string, error) {
 	user, err := database.GetUserByEmail(ctx, email)
 	if err != nil {
@@ -43,7 +50,7 @@ func ValidateUser(ctx context.Context, email, password string) (string, error) {
 		return "", fmt.Errorf("invalid credentials")
 	}
 
-	token, err := jwt.GenerateJWT(email)
+	token, err := GenerateJWT(email)
 	if err != nil {
 		return "", err
 	}

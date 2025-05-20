@@ -1,0 +1,593 @@
+{
+	"info": {
+		"_postman_id": "1234",
+		"name": "Stock Market API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"description": "API collection for stock market operations with multi-exchange support"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"testpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["signup"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"testpassword123\"\n}"
+								},
+								"url": "{{baseUrl}}/signup"
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"message\": \"User created successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login successful\", function() {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.environment.set(\"jwt_token\", jsonData.token);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"testpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["login"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"testpassword123\"\n}"
+								},
+								"url": "{{baseUrl}}/login"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Stock",
+			"item": [
+				{
+					"name": "Search Stocks - NYSE GOLD",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": \"GOLD\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/search",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", "search"]
+						}
+					}
+				},
+				{
+					"name": "Get Stock Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/details?symbol=GOLD&exchange=NYSE",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", "details"],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "GOLD",
+									"description": "Stock symbol to fetch details for"
+								},
+								{
+									"key": "exchange",
+									"value": "NYSE",
+									"description": "Exchange where the stock is listed"
+								}
+							]
+						},
+						"description": "Get detailed information about a stock including current price, volume, and other metrics. Use query parameters 'symbol' and 'exchange'."
+					},
+					"response": [
+						{
+							"name": "Success - NYSE GOLD",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/stock/details?symbol=GOLD&exchange=NYSE",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "stock", "details"],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "GOLD"
+										},
+										{
+											"key": "exchange",
+											"value": "NYSE"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"symbol\": \"GOLD\",\n    \"name\": \"Barrick Gold Corporation\",\n    \"exchange\": \"NYSE\",\n    \"currency\": \"USD\",\n    \"price\": 16.85,\n    \"change\": -0.15,\n    \"change_percent\": -0.88,\n    \"high\": 17.02,\n    \"low\": 16.81,\n    \"volume\": 15234567,\n    \"last_updated\": \"2024-03-19T10:30:00Z\"\n}"
+						},
+						{
+							"name": "Error - Missing Exchange",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{baseUrl}}/api/stock/details?symbol=GOLD"
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Exchange parameter is required\"\n}"
+						},
+						{
+							"name": "Error - Invalid Symbol",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{baseUrl}}/api/stock/details?symbol=INVALID&exchange=NYSE"
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Stock not found\"\n}"
+						},
+						{
+							"name": "Error - API Key Missing",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{baseUrl}}/api/stock/details?symbol=GOLD&exchange=NYSE"
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Failed to fetch stock details\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Stock Details - NSE GOLDBEES",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/details?symbol=GOLDBEES&exchange=NSE",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", "details"],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "GOLDBEES"
+								},
+								{
+									"key": "exchange",
+									"value": "NSE"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Stock to Portfolio",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"symbol\": \"GOLD\",\n    \"exchange\": \"NYSE\",\n    \"currency\": \"USD\",\n    \"quantity\": 100,\n    \"purchase_price\": 16.85\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/add",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", "add"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"message\": \"Stock added to portfolio successfully\",\n    \"stock_id\": \"550e8400-e29b-41d4-a716-446655440000\"\n}"
+						},
+						{
+							"name": "Error - Invalid Token",
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Invalid or expired token\"\n}"
+						},
+						{
+							"name": "Error - Missing Fields",
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Missing required fields: exchange, currency\"\n}"
+						},
+						{
+							"name": "Error - Invalid Exchange",
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Invalid exchange. Supported exchanges: NYSE, NSE, ASX, TSX, Euronext\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List User's Portfolio",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/list",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", "list"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"stocks\": [\n        {\n            \"stock_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n            \"symbol\": \"GOLD\",\n            \"name\": \"Barrick Gold Corporation\",\n            \"exchange\": \"NYSE\",\n            \"currency\": \"USD\",\n            \"quantity\": 100,\n            \"purchase_price\": 16.85,\n            \"current_price\": 16.90,\n            \"total_value\": 1690.00,\n            \"profit_loss\": 5.00,\n            \"profit_loss_percent\": 0.30,\n            \"added_at\": \"2024-03-19T09:30:00Z\",\n            \"last_updated\": \"2024-03-19T10:30:00Z\"\n        }\n    ],\n    \"portfolio_summary\": {\n        \"total_stocks\": 1,\n        \"total_value_usd\": 1690.00,\n        \"total_profit_loss_usd\": 5.00,\n        \"total_profit_loss_percent\": 0.30\n    }\n}"
+						},
+						{
+							"name": "Error - Unauthorized",
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Missing or invalid authorization token\"\n}"
+						},
+						{
+							"name": "Error - Empty Portfolio",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"stocks\": [],\n    \"portfolio_summary\": {\n        \"total_stocks\": 0,\n        \"total_value_usd\": 0,\n        \"total_profit_loss_usd\": 0,\n        \"total_profit_loss_percent\": 0\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Remove Stock from Portfolio",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/:stockId",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", ":stockId"],
+							"variable": [
+								{
+									"key": "stockId",
+									"value": "550e8400-e29b-41d4-a716-446655440000"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"message\": \"Stock removed successfully\",\n    \"removed_stock\": {\n        \"symbol\": \"GOLD\",\n        \"exchange\": \"NYSE\",\n        \"quantity\": 100\n    }\n}"
+						},
+						{
+							"name": "Error - Stock Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Stock not found in portfolio\"\n}"
+						},
+						{
+							"name": "Error - Invalid Stock ID",
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Invalid stock ID format\"\n}"
+						},
+						{
+							"name": "Error - Unauthorized",
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Missing or invalid authorization token\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Search Stocks - Multiple Exchanges",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": \"GOLD\",\n    \"exchanges\": [\"NYSE\", \"NSE\", \"ASX\", \"TSX\", \"Euronext\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/search",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", "search"]
+						}
+					}
+				},
+				{
+					"name": "Get Stock Details - TSX GOLD",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/details?symbol=GOLD&exchange=TSX",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", "details"],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "GOLD"
+								},
+								{
+									"key": "exchange",
+									"value": "TSX"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Stock Details - Euronext GOLD",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/stock/details?symbol=GOLD&exchange=Euronext&currency=EUR",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stock", "details"],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "GOLD"
+								},
+								{
+									"key": "exchange",
+									"value": "Euronext"
+								},
+								{
+									"key": "currency",
+									"value": "EUR"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+} 

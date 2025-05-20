@@ -1,30 +1,38 @@
 package router
 
 import (
+	"stockmarket/server/api/handler"
+	middleware "stockmarket/server/api/middleware"
+
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/atgdot/stockmarket/serverapi/handler"
-	"github.com/atgdot/stockmarket/serverapi/middleware/auth"
+	echomw "github.com/labstack/echo/v4/middleware"
 )
 
 func StartServer() {
 	e := echo.New()
 
 	// Global middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	e.Use(echomw.Logger())
+	e.Use(echomw.Recover())
+	e.Use(echomw.CORS())
 
 	// Public routes
 	e.POST("/signup", handler.SignUp)
 	e.POST("/login", handler.Login)
 
-	// Protected routes
+	// Public stock routes
+	e.POST("/api/stock/search", handler.SearchStock)
+	e.GET("/api/stock/details", handler.FetchStockDetails)
+
+	// Protected routes (require authentication)
 	api := e.Group("/api")
-	api.Use(auth.JWTMiddleware())
+	api.Use(middleware.JWTMiddleware())
 
-	api.GET("/me", handler.Me)
+	// Stock management routes (fixed paths)
 	api.POST("/stock/add", handler.AddStock)
-	api.GET("/stock/fetch", handler.FetchStock)
+	api.GET("/stock/list", handler.GetUserStocks)
+	api.DELETE("/stock/:stockId", handler.RemoveStock)
 
+	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
 }
