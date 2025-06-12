@@ -186,3 +186,58 @@ func GetAllUniqueStocks(ctx context.Context) ([]models.Stock, error) {
 
 	return stocks, nil
 }
+
+// GetStock retrieves a stock by its ID
+func (db *Database) GetStock(ctx context.Context, stockID string) (*models.Stock, error) {
+	tableName := os.Getenv("STOCKS_TABLE")
+	if tableName == "" {
+		return nil, fmt.Errorf("STOCKS_TABLE environment variable not set")
+	}
+
+	result, err := db.client.GetItem(ctx, &dynamodb.GetItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]types.AttributeValue{
+			"stock_id": &types.AttributeValueMemberS{Value: stockID},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stock: %v", err)
+	}
+
+	if result.Item == nil {
+		return nil, fmt.Errorf("stock not found")
+	}
+
+	var stock models.Stock
+	err = attributevalue.UnmarshalMap(result.Item, &stock)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal stock: %v", err)
+	}
+
+	return &stock, nil
+}
+
+// UpdateStock updates a stock in the database
+func (db *Database) UpdateStock(ctx context.Context, stock *models.Stock) error {
+	tableName := os.Getenv("STOCKS_TABLE")
+	if tableName == "" {
+		return fmt.Errorf("STOCKS_TABLE environment variable not set")
+	}
+
+	stock.LastUpdated = time.Now()
+
+	av, err := attributevalue.MarshalMap(stock)
+	if err != nil {
+		return fmt.Errorf("failed to marshal stock: %v", err)
+	}
+
+	_, err = db.client.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName: aws.String(tableName),
+		Item:      av,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to update stock: %v", err)
+	}
+
+	return nil
+}
